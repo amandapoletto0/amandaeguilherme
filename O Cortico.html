@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cortiços do Século XIX vs Favelas do Século XXI</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(120deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            text-align: center;
+            padding: 50px 20px;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: 100% 100%;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+        
+        .authors {
+            margin-top: 20px;
+            font-style: italic;
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+        }
+        
+        .intro, .comparison-chart, .conclusion {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+            border-left: 5px solid #6a11cb;
+        }
+        
+        .intro::before, .comparison-chart::before, .conclusion::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(120deg, rgba(106, 17, 203, 0.1) 0%, rgba(37, 117, 252, 0.1) 100%);
+            border-radius: 0 0 0 100%;
+        }
+        
+        .intro h2, .conclusion h2, .comparison-chart h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 2rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        
+        .intro h2::after, .conclusion h2::after, .comparison-chart h2::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            border-radius: 2px;
+        }
+        
+        .comparison-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+        
+        .era-card {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        
+        .era-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        
+        .era-header {
+            padding: 25px;
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .era-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .xix-header {
+            background: linear-gradient(120deg, #ff7e5f 0%, #feb47b 100%);
+        }
+        
+        .xxi-header {
+            background: linear-gradient(120deg, #00cdac 0%, #02aab0 100%);
+        }
+        
+        .era-content {
+            padding: 25px;
+        }
+        
+        .topic {
+            margin-bottom: 25px;
+            position: relative;
+            padding-left: 60px;
+        }
+        
+        .topic-icon {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(120deg, #6a11cb 0%, #2575fc 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+        }
+        
+        .topic h3 {
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.3rem;
+        }
+        
+        canvas {
+            max-width: 100%;
+            margin-top: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(120deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 14px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            background: linear-gradient(120deg, #2c3e50 0%, #4a6580 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            margin-top: 50px;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .decoration {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(120deg, rgba(106, 17, 203, 0.1) 0%, rgba(37, 117, 252, 0.1) 100%);
+            z-index: -1;
+        }
+        
+        .decoration-1 {
+            top: -100px;
+            right: -100px;
+        }
+        
+        .decoration-2 {
+            bottom: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+        }
+        
+        @media (max-width: 768px) {
+            .comparison-section {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .topic {
+                padding-left: 50px;
+            }
+            
+            .topic-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cortiços do Século XIX vs Favelas do Século XXI</h1>
+            <p class="subtitle">Um estudo comparativo sobre condições de vida, urbanização e impactos sociais com base em "O Cortiço" de Aluísio Azevedo</p>
+            <div class="authors">
+                <p>Trabalho de Literatura realizado por Amanda Poletto e Guilherme - Turma INFO 2</p>
+            </div>
+        </header>
+        
+        <div class="intro">
+            <h2>Estudo Social e Urbanização</h2>
+            <p>Esta análise compara as condições de vida nos cortiços do século XIX, retratados na obra de Aluísio Azevedo, com as favelas contemporâneas, abordando questões essenciais como saneamento, educação, saúde e vida coletiva. Através deste estudo, podemos compreender as transformações e permanências nas habitações populares brasileiras.</p>
+        </div>
+        
+        <div class="comparison-section">
+            <div class="era-card">
+                <div class="era-header xix-header">
+                    <h2>Cortiços no Século XIX</h2>
+                    <p>Contexto histórico da obra "O Cortiço" (1890)</p>
+                </div>
+                <div class="era-content">
+                    <div class="topic">
+                        <div class="topic-icon">
+                            <i class="fas fa-shower"></i>
+                        </div>
+                        <h3>Saneamento Básico</h3>
+                        <p>Sem esgoto ou água encanada, os moradores dividiam banheiros precários. Doenças eram comuns devido ao lixo acumulado e à falta de higiene, com ratos e insetos proliferando-se livremente.</p>
+                    </div>
+                    
+                    <div class="topic">
+                        <div class="topic-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>Educação</h3>
+                        <p>Escolas eram raras, crianças trabalhavam cedo e o analfabetismo ultrapassava 80%. O acesso ao conhecimento era privilégio de poucos, perpetuando ciclos de pobreza.</p>
+                    </div>
+                    
+                    <div class="topic">
+                        <div class="topic-icon">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h3>Saúde</h3>
+                        <p>Tuberculose, varíola e cólera eram frequentes, com acesso quase nulo a médicos ou tratamentos adequados. A superlotação facilitava a propagação de doenças.</p>
+                    </div>
+                    
+                    <div class="topic">
+                        <div class="topic-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Vida Coletiva</h3>
+                        <p>A convivência era intensa, mas marcada por hierarquias e exploração do dono do cortiço. As relações sociais eram complexas, com solidariedade e conflitos coexistindo.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="era-card">
+                <div class="era-header xxi-header">
+                    <h2>Favelas no Século XXI</h2>
+                    <p>Realidade atual das habitações populares</p>
+                </div>
+                <div class="era-content">
+                    <div class="topic">
+                        <div class="topic-icon">
+                            <i class="fas fa-faucet"></i>
+                        </div>
+                        <h3>Saneamento Básico</h3>
+                        <p>Muitos avanços, mas o esgoto a céu aberto ainda é realidade em várias comunidades. Programas governamentais trouxeram melhorias, mas a universalização ainda é um desafio.</p>
+                    </div>
+                    
+                    <div class="topic">
+                        <div class="topic-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>Educação</h3>
+                        <p>Mais acesso ao ensino, porém desafios persistem, como evasão escolar e baixa qualidade. Programas sociais facilitaram o ingresso no ensino superior, mas a desigualdade educacional permanece.</p>
+                    </div>
+                    
+                    <div class="topic">
+                        <div class="topic-icon">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                        <h3>Saúde</h3>
+                        <p>Postos de saúde existem, mas a infraestrutura ainda é insuficiente para a demanda. Novos problemas de saúde pública surgiram, como doenças mentais e crônicas.</p>
+                    </div>
+                    
+                    <div class="topic">
+                        <div class="topic-icon">
+                            <i class="fas fa-hands-helping"></i>
+                        </div>
+                        <h3>Vida Coletiva</h3>
+                        <p>Senso comunitário forte, com redes de solidariedade e associações atuantes. A organização popular conquistou direitos, mas a violência ainda é um desafio em muitas comunidades.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="comparison-chart">
+            <h2>Comparativo Estatístico</h2>
+            <p>Indicadores de qualidade de vida em cortiços do século XIX versus favelas atuais</p>
+            <canvas id="comparativoChart"></canvas>
+        </div>
+        
+        <div class="conclusion">
+            <h2>Conclusão</h2>
+            <p>A análise revela avanços significativos desde o século XIX, mas também a permanência de desigualdades. O saneamento, a saúde e a educação melhoraram, porém não alcançam todos igualmente.</p>
+            
+            <p>A obra <em>"O Cortiço"</em> continua atual ao expor como as condições de moradia moldam vidas. Hoje, embora as favelas tenham mais infraestrutura e mobilização social, os desafios da exclusão permanecem.</p>
+            
+            <p>Este estudo mostra que a transformação só será plena quando políticas públicas garantirem dignidade habitacional, oportunidades de estudo e saúde de qualidade para toda a população. A comparação histórica nos permite compreender tanto o progresso alcançado quanto os desafios que ainda precisam ser superados.</p>
+        </div>
+        
+        <footer>
+            <p>Estudo baseado em "O Cortiço" de Aluísio Azevedo e pesquisas sobre urbanização.</p>
+            <p>Trabalho de Literatura realizado por Amanda Poletto e Guilherme - Turma INFO 2</p>
+        </footer>
+    </div>
+
+    <script>
+        // Configuração do gráfico
+        const ctx = document.getElementById('comparativoChart').getContext('2d');
+        
+        // Dados para o gráfico
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Saneamento', 'Educação', 'Saúde', 'Vida Coletiva'],
+                datasets: [
+                    {
+                        label: 'Século XIX (Cortiços)',
+                        data: [20, 15, 25, 80],
+                        backgroundColor: '#ff7e5f',
+                        borderColor: '#ff7e5f',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Século XXI (Favelas)',
+                        data: [60, 70, 65, 85],
+                        backgroundColor: '#02aab0',
+                        borderColor: '#02aab0',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            font: {
+                                size: 14,
+                                family: "'Poppins', 'Segoe UI', Tahoma, sans-serif"
+                            }
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Evolução das Condições de Vida (%)',
+                        font: {
+                            size: 18,
+                            family: "'Poppins', 'Segoe UI', Tahoma, sans-serif"
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            font: {
+                                family: "'Poppins', 'Segoe UI', Tahoma, sans-serif"
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                family: "'Poppins', 'Segoe UI', Tahoma, sans-serif",
+                                size: 13
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    </script>
+</body>
+</html>
